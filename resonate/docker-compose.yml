@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: resonate_db
+    environment:
+      POSTGRES_USER: resonate
+      POSTGRES_PASSWORD: resonate_password
+      POSTGRES_DB: resonate
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: resonate_backend
+    environment:
+      POSTGRES_DSN: postgresql+psycopg2://resonate:resonate_password@db:5432/resonate
+      JWT_SECRET_KEY: "supersecretchangeme"
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/alembic.ini:/app/alembic.ini
+
+volumes:
+  db_data:
