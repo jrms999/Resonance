@@ -1,129 +1,61 @@
 # Resonance
-Music streaming service
 
+Resonance is an early FastAPI backend prototype for a music-engagement rewards product. It explores awarding **BTN** loyalty points when authenticated users listen to tracks.
 
-Resonate 🎧
+## Repository status
 
-A music streaming app with Bitcoin-flavoured engagement rewards (BTN tokens).
+This repository currently contains the backend only. It is a prototype, not a production-ready streaming service.
 
-Resonate is a Spotify-style streaming backend + starter mobile client where:
+### Implemented
 
-Users stream tracks and earn BTN (BeatCoin) loyalty tokens for engagement.
+- User registration and JWT-based login
+- Track listing and individual track lookup
+- Recording play-complete events
+- BTN balance and transaction history
+- Reward rules:
+  - 2 BTN for a full play (at least 80% complete)
+  - 1 BTN for a partial play of at least 30 seconds
+  - 100 BTN daily earning cap
+- PostgreSQL-backed SQLAlchemy models
+- Docker and Docker Compose development files
 
-BTN can be used for rewards (e.g. premium time, perks) and supporting artists.
+Tracks currently reference a stored `audio_url`. The repository does not upload, host, or transcode audio.
 
-Audio is stored in S3 and streamed via presigned URLs.
+### Not yet implemented
 
-Artists can upload tracks directly to S3 via presigned PUT URLs.
+- React Native or Expo client
+- S3 uploads or presigned streaming URLs
+- Artist upload portal
+- Likes, playlists, subscriptions, or admin dashboards
+- Production deployment, monitoring, or a demonstrated migration workflow
+- Automated tests
 
-This repo currently focuses on the backend API (FastAPI) and a React Native (Expo) client skeleton.
+## Important limitations
 
-Features (MVP)
+- Play events do not yet have idempotency or duplicate-play protection. Repeated valid requests can award points until the daily cap is reached.
+- Authentication and reward abuse controls need a security review before real users or payments are introduced.
+- Docker Compose contains development-only example credentials. Replace all secrets outside local development.
+- Dependency compatibility and a clean-start database workflow still need to be locked down and tested.
 
-Backend
+## Current structure
 
-User registration & login (JWT auth)
+```text
+resonate/
+├── api/          # FastAPI routes
+├── core/         # configuration and security helpers
+├── db/           # SQLAlchemy base and session
+├── models/       # users, tracks, play events, token ledger
+├── schemas/      # request and response models
+└── services/     # reward calculations
+```
 
-Roles: user, artist, admin
+## Recommended next milestones
 
-Music catalog: artists, albums, tracks
+1. Add a reproducible local setup with `.env.example`, pinned dependencies, and migrations.
+2. Add API tests for authentication, reward thresholds, daily caps, and duplicate requests.
+3. Add idempotency and anti-abuse controls to play rewards.
+4. Add CI for tests and dependency/security scanning.
+5. Build a minimal client only after the backend contract is tested.
+6. Add object storage and signed URLs when real audio ingestion is in scope.
 
-Engagement:
-
-Log plays (play-complete)
-
-Like tracks
-
-Rewards:
-
-BTN balances per user
-
-Auto-earning BTN on:
-
-Full/partial plays
-
-First likes
-
-Daily earning cap
-
-Artist portal APIs:
-
-Generate presigned upload URLs (S3 PUT)
-
-Create tracks linked to artist profiles
-
-Admin endpoints:
-
-/admin/health
-
-/admin/stats (users, tracks, plays, BTN issued)
-
-Mobile client (Expo)
-
-Register / login
-
-List tracks
-
-“Play” a track (calls play-complete, earns BTN)
-
-View token balance + recent transactions
-
-Tech Stack
-
-Backend
-
-Python 3.11+
-
-FastAPI
-
-SQLAlchemy 2.x + Alembic
-
-PostgreSQL
-
-JWT auth (python-jose)
-
-Password hashing (passlib[bcrypt])
-
-AWS S3 (boto3) for audio storage, presigned GET/PUT
-
-Mobile
-
-React Native (Expo, TypeScript)
-
-Axios for API calls
-
-Architecture (high-level)
-
-Modular monolith backend with modules:
-
-auth, users, catalog/tracks, playlists, engagement, rewards, subscriptions (stub), artist, admin
-
-PostgreSQL schema includes:
-
-users, artists, albums, tracks
-
-play_events, user_tracks
-
-token_balances, token_transactions
-
-user_artists (user↔artist mapping)
-
-S3 storage:
-
-storage_key for audio objects (artists/{artist_id}/{uuid}_{filename})
-
-Presigned GET URLs returned as stream_url
-
-Presigned PUT URLs for artist uploads
-
-Prerequisites
-
-Docker + docker-compose or:
-
-Python 3.11+
-
-PostgreSQL
-
-Node.js + npm/yarn (for the mobile app)
-
-AWS account + S3 bucket (for real audio streaming)
+The earlier README described several planned features as complete. This version deliberately separates implemented code from roadmap items so the portfolio accurately reflects the repository.
