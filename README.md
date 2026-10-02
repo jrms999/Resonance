@@ -41,12 +41,19 @@ Tracks currently reference a stored `audio_url`. The repository does not upload,
 
 ```text
 resonate/
-├── api/          # FastAPI routes
-├── core/         # configuration and security helpers
-├── db/           # SQLAlchemy base and session
-├── models/       # users, tracks, play events, token ledger
-├── schemas/      # request and response models
-└── services/     # reward calculations
+├── backend/
+│   ├── app/
+│   │   ├── api/          # FastAPI routes
+│   │   ├── core/         # configuration, security, and database helpers
+│   │   │   └── database.py  # SQLAlchemy base, engine, and session
+│   │   ├── models/       # users, tracks, play events, token ledger
+│   │   ├── schemas/      # request and response models
+│   │   ├── services/     # reward calculations
+│   │   └── main.py       # FastAPI application entry point
+│   ├── Dockerfile
+│   ├── alembic.ini
+│   └── requirements.txt
+└── docker-compose.yml
 ```
 
 ## Recommended next milestones
