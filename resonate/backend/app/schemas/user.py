@@ -8,4 +8,4 @@ class UserOut(BaseModel):
     subscription_status: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True

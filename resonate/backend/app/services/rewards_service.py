@@ -48,7 +48,7 @@ def _apply_earn(db: Session, user_id: int, delta_btn: int, source: str, metadata
         delta_btn=grant,
         type="earn",
         source=source,
-        metadata=metadata or {},
+        details=metadata or {},
     )
     db.add(tx)
     return grant

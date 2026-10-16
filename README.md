@@ -28,7 +28,7 @@ Tracks currently reference a stored `audio_url`. The repository does not upload,
 - Artist upload portal
 - Likes, playlists, subscriptions, or admin dashboards
 - Production deployment, monitoring, or a demonstrated migration workflow
-- Automated tests
+- PostgreSQL integration and reward-replay tests
 
 ## Important limitations
 
@@ -66,3 +66,44 @@ resonate/
 6. Add object storage and signed URLs when real audio ingestion is in scope.
 
 The earlier README described several planned features as complete. This version deliberately separates implemented code from roadmap items so the portfolio accurately reflects the repository.
+
+## Local development (Python 3.12)
+
+From `resonate/backend/`:
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r test-requirements.txt
+cp .env.example .env
+```
+
+Replace the example JWT secret in `.env`. Start the local PostgreSQL service from
+`resonate/` with `docker compose up -d db`, then return to `resonate/backend/`:
+
+```bash
+python -m app.init_demo_db
+python -m app.seed_demo_data
+uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+The initializer creates missing tables in an empty **local demo** database. It
+does not migrate existing schemas or drop tables. `alembic.ini` is a placeholder:
+there is still no working Alembic migration directory. Do not run this workflow
+against a production database. Seed audio URLs are placeholders, not playable media.
+
+Run smoke tests from `resonate/backend/`:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+These tests use a temporary SQLite database and cover startup, repeatable table
+initialization/seeding, catalogue responses, registration/login, protected balance
+access, and the token metadata column mapping. They do not prove PostgreSQL
+behavior, reward concurrency, or protection against repeated play requests.
+GitHub Actions runs the same smoke tests on Python 3.12.
+
+Direct dependencies are pinned to the versions tested for this setup. Transitive
+dependencies are not yet locked. Passlib/bcrypt remains a legacy compatibility
+choice; a modern password-hashing migration is still future security work.
