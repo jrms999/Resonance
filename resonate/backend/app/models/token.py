@@ -23,5 +23,5 @@ class TokenTransaction(Base):
     delta_btn = Column(BigInteger, nullable=False)
     type = Column(String(30), nullable=False)
     source = Column(String(50), nullable=True)
-    metadata = Column(JSON, nullable=True)
+    details = Column("metadata", JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
